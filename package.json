@@ -2,7 +2,7 @@
   "name": "plant-maintenance",
   "version": "1.0.0",
   "description": "CAP App used for sap plant maintenance",
-  "repository": "<Add your repository here>",
+  "repository": "https://github.com/momen-sap/plant-maintenance.git",
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
@@ -10,9 +10,16 @@
     "express": "latest"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "latest"
+    "@cap-js/sqlite": "latest",
+    "@sap/ux-specification": "latest"
   },
   "scripts": {
-    "start": "cds-serve"
-  }
+    "start": "cds-serve",
+    "watch-tasks-ui": "cds watch --open tasks-ui/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-tasksui": "cds watch --open tasksui/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "sapux": [
+    "app/tasks-ui",
+    "app/tasksui"
+  ]
 }
