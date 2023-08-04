@@ -16,10 +16,12 @@
   "scripts": {
     "start": "cds-serve",
     "watch-tasks-ui": "cds watch --open tasks-ui/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-tasksui": "cds watch --open tasksui/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-tasksui": "cds watch --open tasksui/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-workordersui": "cds watch --open workordersui/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "sapux": [
     "app/tasks-ui",
-    "app/tasksui"
+    "app/tasksui",
+    "app/workordersui"
   ]
 }
