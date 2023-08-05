@@ -1,0 +1,31 @@
+{
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.TechEmployee",
+      "description": "TechEmployee"
+    },
+    {
+      "name": "$XSAPPNAME.PlantManager",
+      "description": "PlantManager"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "TechEmployee",
+      "description": "Tech Employee in Plant Maintenance.",
+      "scope-references": [
+        "$XSAPPNAME.TechEmployee"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "PlantManager",
+      "description": "Plant Manager in Plant Maintenance.",
+      "scope-references": [
+        "$XSAPPNAME.PlantManager"
+      ],
+      "attribute-references": []
+    }
+  ]
+}

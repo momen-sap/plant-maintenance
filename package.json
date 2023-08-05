@@ -7,21 +7,34 @@
   "private": true,
   "dependencies": {
     "@sap/cds": "latest",
-    "express": "latest"
+    "express": "latest",
+    "@sap/cds-hana": "^2",
+    "@sap/xssec": "^3",
+    "passport": "^0"
   },
   "devDependencies": {
     "@cap-js/sqlite": "latest",
+    "@sap/cds-dk": "^7",
     "@sap/ux-specification": "latest"
+  },
+  "engines": {
+    "node": "^16"
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-tasks-ui": "cds watch --open tasks-ui/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-tasksui": "cds watch --open tasksui/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-workordersui": "cds watch --open workordersui/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch": "cds watch --open index-launchpage.html?sap-ui-xx-viewCache=false"
   },
   "sapux": [
     "app/tasks-ui",
     "app/tasksui",
     "app/workordersui"
-  ]
+  ],
+  "cds": {
+    "requires": {
+      "[production]": {
+        "db": "hana",
+        "auth": "xsuaa"
+      }
+    }
+  }
 }
