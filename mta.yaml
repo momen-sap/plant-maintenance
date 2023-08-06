@@ -9,6 +9,7 @@ build-parameters:
     - builder: custom
       commands:
         - npx cds build --production
+        - npx rimraf gen/db/src/gen/data
 modules:
   - name: plant-maintenance-srv
     type: nodejs
@@ -41,7 +42,7 @@ resources:
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: plant-maintenance-${org}-${space}
+        xsappname: plant-maintenance
         tenant-mode: dedicated
   - name: plant-maintenance-db
     type: com.sap.xs.hdi-container

@@ -8,17 +8,18 @@
   "dependencies": {
     "@sap/cds": "latest",
     "express": "latest",
-    "@sap/cds-hana": "^2",
-    "@sap/xssec": "^3",
-    "passport": "^0"
+    "@sap/cds-hana": "latest",
+    "@sap/xssec": "latest",
+    "passport": "latest"
   },
   "devDependencies": {
     "@cap-js/sqlite": "latest",
-    "@sap/cds-dk": "^7",
-    "@sap/ux-specification": "latest"
+    "@sap/cds-dk": "latest",
+    "@sap/ux-specification": "latest",
+    "rimraf": "latest"
   },
   "engines": {
-    "node": "^16"
+    "node": "^18"
   },
   "scripts": {
     "start": "cds-serve",
