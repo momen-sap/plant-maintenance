@@ -1,54 +1,153 @@
-_schema-version: '3.1'
+_schema-version: "3.1"
 ID: plant-maintenance
+description: CAP App used for sap plant maintenance
 version: 1.0.0
-description: "CAP App used for sap plant maintenance"
-parameters:
-  enable-parallel-deployments: true
-
-build-parameters:
-  before-all:
-    - builder: custom
-      commands:
-        - npx cds build --production
-        - npx rimraf gen/db/src/gen/data
 
 modules:
-  - name: plant-maintenance-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      buildpack: nodejs_buildpack
-    build-parameters:
-      builder: npm
-    provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
-        properties:
-          srv-url: ${default-url}
-    requires:
-      - name: plant-maintenance-auth
-      - name: plant-maintenance-db
+- name: plant-maintenance-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: plant-maintenance-db
+  parameters:
+    buildpack: nodejs_buildpack
 
-  - name: plant-maintenance-db-deployer
-    type: hdb
-    path: gen/db
+- name: plant-maintenance-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: plant-maintenance-auth
+  - name: plant-maintenance-db
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+  build-parameters:
+    builder: npm
+
+- name: plant-maintenance-destinations
+  type: com.sap.application.content
+  requires:
+  - name: plant-maintenance-auth
     parameters:
-      buildpack: nodejs_buildpack
+      service-key:
+        name: plant-maintenance-uaa-key
+  - name: plant-maintenance-html5-repo-host
+    parameters:
+      service-key:
+        name: plant-maintenance-html5-repo-host-key
+  - name: srv-api
+  - name: plant-maintenance-destination
+    parameters:
+      content-target: true
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Authentication: OAuth2UserTokenExchange
+          Name: plant-maintenance-srv
+          TokenServiceInstanceName: plant-maintenance-auth
+          TokenServiceKeyName: plant-maintenance-key
+          URL: ~{srv-api/srv-url}
+          sap.cloud.service: plant-maintenance.service
+        - Name: plant-maintenance-html5-repo-host
+          ServiceInstanceName: plant-maintenance-html5-repo-host
+          ServiceKeyName: plant-maintenance-html5-repo-host-key
+          sap.cloud.service: plant-maintenance.service
+        - Authentication: OAuth2UserTokenExchange
+          Name: plant-maintenance-auth
+          ServiceInstanceName: plant-maintenance-auth
+          ServiceKeyName: plant-maintenance-uaa-key
+          sap.cloud.service: plant-maintenance.service
+        existing_destinations_policy: update
+  build-parameters:
+    no-source: true
+
+- name: plant-maintenance-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: plant-maintenance-html5-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
     requires:
-      - name: plant-maintenance-db
+    - artifacts:
+      - workordersui.zip
+      name: workordersui
+      target-path: resources/
+    - artifacts:
+      - tasksui.zip
+      name: tasksui
+      target-path: resources/
+
+- name: workordersui
+  type: html5
+  path: app/workordersui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+
+- name: tasksui
+  type: html5
+  path: app/tasksui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
 
 resources:
-  - name: plant-maintenance-auth
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: plant-maintenance
-        tenant-mode: dedicated
-        
-  - name: plant-maintenance-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
+- name: plant-maintenance-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      tenant-mode: dedicated
+      xsappname: plant-maintenance
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+- name: plant-maintenance-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+- name: plant-maintenance-destination
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+    service: destination
+    service-plan: lite
+- name: plant-maintenance-html5-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npx cds build --production
+    - npx rimraf gen/db/src/gen/data
